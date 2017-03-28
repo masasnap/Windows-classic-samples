@@ -668,11 +668,19 @@ HRESULT MFPlayer2::CanRewind(BOOL *pbCanRewind)
 
     float fSlowest = 0.0f, fFastest = 0.0f;
 
-    if (m_pPlayer)
-    {
-        // Ask for the supported rates in the reverse direction.
-        hr = m_pPlayer->GetSupportedRates(FALSE, &fSlowest, &fFastest);
-    }
+#if 1
+	if (m_pPlayer)
+	{
+		// Ask for the supported rates in the forward direction.
+		hr = m_pPlayer->GetSupportedRates(TRUE, &fSlowest, &fFastest);
+	}
+#else
+	if (m_pPlayer)
+	{
+		// Ask for the supported rates in the reverse direction.
+		hr = m_pPlayer->GetSupportedRates(FALSE, &fSlowest, &fFastest);
+	}
+#endif
 
     if (SUCCEEDED(hr))
     {
@@ -748,12 +756,21 @@ HRESULT MFPlayer2::FastForward()
 HRESULT MFPlayer2::Rewind()
 {
     HRESULT hr = S_OK;
-    float   fTarget = GetNominalRate() * 2;
+#if 1
+	float   fTarget = GetNominalRate() / 2;
 
-    if (fTarget >= 0.0f)
-    {   
-        fTarget = -1.0f;
-    }
+	if (fTarget <= 0.0f)
+	{
+		fTarget = 1.0f;
+	}
+#else
+	float   fTarget = GetNominalRate() * 2;
+
+	if (fTarget >= 0.0f)
+	{
+		fTarget = -1.0f;
+	}
+#endif
 
     hr = SetPlaybackRate(fTarget);
 
